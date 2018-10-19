@@ -45,7 +45,7 @@ function turnClick(square) {
     if (typeof origBoard[square.target.id] == 'number') {
         //передаем в функцию turn номер клетки и игрока делаем ход кароче
         turn(square.target.id, huPlayer);
-          //если не победа , не ничья то запуск функции turn с параметкрами функции хода ИИ и именем ИИ игрока
+          //если не победа , не ничья то запуск функции turn с параметрами функции хода ИИ и именем ИИ игрока
         if (!checkWin(origBoard,huPlayer) && !checkTie()) {
             turn(bestSpot(), aiPlayer);
         } 
@@ -60,29 +60,24 @@ function turn(squareId, player) {
     document.getElementById(squareId).innerText = player;
        //переменной присваеваем результат функции в которую передаем наше поле и текущего игрока
     let gameWon = checkWin(origBoard, player);
+    console.log(gameWon)
       // в  gameWon возвратится значение то запустится функция gameover, а если null то продолжится
     if (gameWon) gameOver(gameWon)
 }
 // проверка на победу
 function checkWin(board, player) {
-    // c помощью метода reduce перебираем если е = игрок то индекс записывается в масив а
-    // let plays = board.reduce((a, e, i) => (e === player) ? a.concat(i) : a,[]);
-
-    let plays = board.reduce(function(comb, val, i) {
-            return (val === player) ? comb.concat(i) : comb
-        } ,[]);
+    // c помощью reduce перебираем если е = игрок то индекс записывается в масив а
+     let plays = board.reduce((a, e, i) => (e === player) ? a.concat(i) : a,[]);
 
     console.log(plays)
 
     let gameWon = null;
     // перебираем многомерный масив где index (выиграшный масив из трех ячеек)
     for (let [index, win] of winCombos.entries()) {
-        // проверяем кадждое елемент win масивчика совпали с plays.indexOf(индексами) если значение больше -1 значит числа из выишрашынх комбинаций совпало снашими ходами
+        // проверяем кадждое елемент win масивчика 
         if (win.every(elem => plays.indexOf(elem) > -1)) {
-            //записываем выиграшную комбинацию и игрока
            // записываем index масивчика и победителя
             gameWon = {index: index, player: player};
-            //прерываем цикл
             break;
         }
     }
@@ -91,29 +86,29 @@ function checkWin(board, player) {
 }
 //функция конца игры
 function gameOver(gameWon) {
-    //цикл в котором проходимся по елементам полученой комбинации
-for (let index of winCombos[gameWon.index]) {
-    //назначаем каждому едементу с id фон с цветом если победил игрок то синий иначе карасный
-    document.getElementById(index).style.backgroundColor = gameWon.player == huPlayer ? "blue" : "red";
-}
-// циклом отцепляем от каждой ячейки события
-for (var i = 0; i < cells.length; i++) {
-    cells[i].removeEventListener('click', turnClick, false);
-}
-// передаем в функцию текст результата
-declareWinner(gameWon.player == huPlayer ? "You win!" : "You lose.");
+        //цикл в котором проходимся по елементам полученой комбинации
+    for (let index of winCombos[gameWon.index]) {
+        //назначаем каждому едементу с id фон с цветом если победил игрок то синий иначе карасный
+        document.getElementById(index).style.backgroundColor = gameWon.player == huPlayer ? "blue" : "red";
+    }
+    // циклом отцепляем от каждой ячейки события
+    for (var i = 0; i < cells.length; i++) {
+        cells[i].removeEventListener('click', turnClick, false);
+    }
+    // передаем в функцию текст результата
+    declareWinner(gameWon.player == huPlayer ? "You win!" : "You lose.");
 }
 //описываем фугкцию результата получаем текст
 function declareWinner(who) {
-    //назначаем класу ендгейм видимость
-document.querySelector(".endgame").style.display = "block";
-    // также текст в блоке будет такой который получили
-document.querySelector(".endgame .text").innerText = who;
+        //назначаем класу ендгейм видимость
+    document.querySelector(".endgame").style.display = "block";
+        // также текст в блоке будет такой который получили
+    document.querySelector(".endgame .text").innerText = who;
 }
 
 
 function emptySquares() {
-return origBoard.filter(s => typeof s == 'number');
+    return origBoard.filter(s => typeof s == 'number');
 }
 //случайное число
 function getRandomInt(min, max) {
@@ -124,23 +119,23 @@ function getRandomInt(min, max) {
 //ход ИИ
 function bestSpot() {
     //возвращает случайный  елемент свободных ячеек
-return emptySquares()[getRandomInt(0,emptySquares().length)];
+    return emptySquares()[getRandomInt(0,emptySquares().length)];
 }
 //ничья
 function checkTie() {
-//если пустых клеток 0
-if (emptySquares().length == 0) {
+    //если пустых клеток 0
+    if (emptySquares().length == 0) {
 
-    for (var i = 0; i < cells.length; i++) {
-        //циклом красим все в зеленый и убираем обработчки событий
-        cells[i].style.backgroundColor = "green";
-        cells[i].removeEventListener('click', turnClick, false);
+        for (var i = 0; i < cells.length; i++) {
+            //циклом красим все в зеленый и убираем обработчки событий
+            cells[i].style.backgroundColor = "green";
+            cells[i].removeEventListener('click', turnClick, false);
+        }
+        //передаем текст ничьи
+        declareWinner("Tie Game!")
+        //возвращаем true в проверку на следующих ход для Ai
+        return true;
     }
-    //передаем текст ничьи
-    declareWinner("Tie Game!")
-    //возвращаем true в проверку на следующих ход для Ai
-    return true;
-}
 return false;
 }
 
