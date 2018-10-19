@@ -16,10 +16,13 @@ const winCombos = [
 ]
 //получаем все что с классом cell в итоге получаем массив состоящий из 9 td
 const cells = document.querySelectorAll('.cell');
-//console.log(cells);
+
 
 //вызов функции
 startGame();
+
+
+
 //описываем функции старта игры
 function startGame() {
     //прячем div конца игры
@@ -38,44 +41,53 @@ function startGame() {
 }
 
 function turnClick(square) {
-    //если тип сожержимого ячейки = числу(тоесть не Х или О) то
-if (typeof origBoard[square.target.id] == 'number') {
-    //передаем в функцию turn номер клетки и игрока делаем ход кароче
-    turn(square.target.id, huPlayer);
-      //если не победа , не ничья то запуск функции turn с параметкрами функции хода ИИ и именем ИИ игрока
-    if (!checkWin(origBoard,huPlayer) && !checkTie()) turn(bestSpot(), aiPlayer);
-}
+    //если тип сожержимого ячейки = числу
+    if (typeof origBoard[square.target.id] == 'number') {
+        //передаем в функцию turn номер клетки и игрока делаем ход кароче
+        turn(square.target.id, huPlayer);
+          //если не победа , не ничья то запуск функции turn с параметкрами функции хода ИИ и именем ИИ игрока
+        if (!checkWin(origBoard,huPlayer) && !checkTie()) {
+            turn(bestSpot(), aiPlayer);
+        } 
+    }
 }
 
 function turn(squareId, player) {
     // присваеваем ячейке  игрока
-origBoard[squareId] = player;
-   // записываем в ячейку на поле значение игрока
-document.getElementById(squareId).innerText = player;
-   //переменной присваеваем функцию в которую передаем наше поле и текущего игрока
-let gameWon = checkWin(origBoard, player)
-  // в  gameWon возвратится значение то запустится функция gameover, а если null то продолжится
-if (gameWon) gameOver(gameWon)
+    origBoard[squareId] = player;
+
+       // записываем в ячейку на поле значение игрока
+    document.getElementById(squareId).innerText = player;
+       //переменной присваеваем результат функции в которую передаем наше поле и текущего игрока
+    let gameWon = checkWin(origBoard, player);
+      // в  gameWon возвратится значение то запустится функция gameover, а если null то продолжится
+    if (gameWon) gameOver(gameWon)
 }
 // проверка на победу
 function checkWin(board, player) {
-// c помощью метода reduce перебираем если е = игрок то индекс записывается в масив а
-let plays = board.reduce((a, e, i) => (e === player) ? a.concat(i) : a,[]);
-// присваевам пустое значение на случай если победной комбинаци не будет
-let gameWon = null;
-// перебираем многомерный масив где index (выиграшный масив из трех ячеек)
-for (let [index, win] of winCombos.entries()) {
-    // проверяем кадждое елемент win масивчика совпали с plays.indexOf(индексами) если значение больше -1 значит числа из выишрашынх комбинаций совпало снашими ходами
-    if (win.every(elem => plays.indexOf(elem) > -1)) {
-        //записываем выиграшную комбинацию и игрока
-       // записываем index масивчика и победителя
-        gameWon = {index: index, player: player};
-        //прерываем цикл
-        break;
+    // c помощью метода reduce перебираем если е = игрок то индекс записывается в масив а
+    // let plays = board.reduce((a, e, i) => (e === player) ? a.concat(i) : a,[]);
+
+    let plays = board.reduce(function(comb, val, i) {
+            return (val === player) ? comb.concat(i) : comb
+        } ,[]);
+
+    console.log(plays)
+
+    let gameWon = null;
+    // перебираем многомерный масив где index (выиграшный масив из трех ячеек)
+    for (let [index, win] of winCombos.entries()) {
+        // проверяем кадждое елемент win масивчика совпали с plays.indexOf(индексами) если значение больше -1 значит числа из выишрашынх комбинаций совпало снашими ходами
+        if (win.every(elem => plays.indexOf(elem) > -1)) {
+            //записываем выиграшную комбинацию и игрока
+           // записываем index масивчика и победителя
+            gameWon = {index: index, player: player};
+            //прерываем цикл
+            break;
+        }
     }
-}
 //передаем результат
-return gameWon;
+    return gameWon;
 }
 //функция конца игры
 function gameOver(gameWon) {
@@ -131,5 +143,4 @@ if (emptySquares().length == 0) {
 }
 return false;
 }
-/*
-*/
+
